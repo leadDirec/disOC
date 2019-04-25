@@ -1,5 +1,7 @@
 分布式强有序实时计算  --  第一版（一个master节点 多个slave节点，轻量级storm golang版本）
 
+应用场景：大数据(行情数据)处理/定时任务调度等
+
 功能：
 1：选举出master节点/slave节点
 2：由master节点从数据源接收数据,分发给slave节点
