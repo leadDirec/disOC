@@ -13,3 +13,8 @@ TODO 1:多master节点管理，随着数据量的增长，可以实现无限的�
 TODO 2:数据事务保证，有ACK消息确认机制
 
 数据结构为了速度设计的比较混乱-- 请略过
+
+启动步骤（本地模式）：
+1：etcd
+2：nsqlookupd    nsqd --lookupd-tcp-address=127.0.0.1:4160   nsqadmin --lookupd-http-address=127.0.0.1:4161
+3：开启5个终端 分别go run main.go

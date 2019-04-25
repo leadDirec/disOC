@@ -26,6 +26,7 @@ type Service struct {
 	IsMasterConsume bool
 	QuorumCap        int //集群数量
 	Master           *atomic.Value
+	MasterNode       *atomic.Value
 	Name             string
 	stop             chan error
 	leaseid          clientv3.LeaseID
@@ -53,6 +54,7 @@ func NewService(endpoints []string,servicePath string, electPath string, quormCa
 		IsMasterConsume:  isMasterConsume,
 		QuorumCap:quormCap,
 		Master:new(atomic.Value),
+		MasterNode:       new(atomic.Value),
 		stop:             make(chan error),
 		client:           cli,
 		ServicePath:      servicePath,
@@ -83,14 +85,15 @@ func (s *Service) Start() error {
 			return err
 		case <-s.client.Ctx().Done():
 			return errors.New("server closed")
-		case ka, ok := <-ch:
+		case _, ok := <-ch:
 			if !ok {
 				fmt.Println("keep alive channel closed")
 				s.revoke()
 				return nil
-			} else {
-				fmt.Println("reply from etcd: %s, ttl:%d ", s.Name, ka.TTL, s.leaseid, ka.ID, ka.ClusterId, ka.MemberId, ka.Revision)
 			}
+			//else {
+			//	fmt.Println("reply from etcd: %s, ttl:%d ", s.Name, ka.TTL, s.leaseid, ka.ID, ka.ClusterId, ka.MemberId, ka.Revision)
+			//}
 		}
 	}
 }
@@ -174,6 +177,7 @@ func (s *Service) WatchSelfNodesData() {
 					fmt.Println("watch node data delete ", ev.IsModify(), string(ev.Kv.Key), string(ev.Kv.Value))
 					if s.Master.Load().(bool) {
 						s.Master.Store(false)
+						s.Master.Store("")
 						s.Scheduler.Stop()
 						s.watchNodesChan <- struct{}{}
 						go s.Election()
@@ -220,6 +224,7 @@ func (s *Service) Election() {
 	defer cancel()
 	fmt.Println("elect success info,", (<-e1.Observe(cctx)))
 	s.Master.Store(true)
+	s.MasterNode.Store(s.Name)
 	fmt.Println("当前节点成功竞选称为master：：：", s.Name)
 	value := s.ChildrenNodeData.Load() //可能是由slave节点转成master节点的
 	if value != nil {
@@ -318,13 +323,13 @@ func (s *Service) assignNode(quorumCap int, keys []string, distributed map[strin
 		}
 	}
 	for _, path := range keys {
-		val := s.Master.Load()
+		val := s.MasterNode.Load()
 		if val == nil {
 			fmt.Println("还没有master，暂时不分发数据，略过...........................")
 			return
 		}
-		masterNode := val.(bool)
-		if masterNode && !s.IsMasterConsume {
+		masterNode := val.(string)
+		if masterNode == path && !s.IsMasterConsume {
 			fmt.Println("主节点不消费数据，略过...........................")
 			continue
 		}
