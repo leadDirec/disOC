@@ -1,0 +1,10 @@
+分布式强有序实时计算  --  第一版（一个master节点 多个slave节点，轻量级storm golang版本）
+1：选举出master节点/slave节点
+2：由master节点从数据源接收数据,分发给slave节点
+3: slave节点处理数据
+4: master/slave众节点可故障转移以及slave节点可动态扩展
+
+问题：单一master节点会有性能瓶颈，slave节点中已参与计算的数据需要可以rollback，避免突发节点故障数据丢失,有一定的事务保证场景
+
+TODO 1:多master节点管理，随着数据量的增长，可以实现无限的横向扩展
+TODO 2:数据事务保证，有ACK消息确认机制
