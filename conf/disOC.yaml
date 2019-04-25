@@ -1,0 +1,23 @@
+etcd_option:
+    hosts:
+       - "127.0.0.1:2379"
+    election_path: "/disoc_election"
+    slave_path: "/disoc_service"
+
+quorum_cap: 5
+
+is_master_consume: false
+
+nsq:
+    addr: "127.0.0.1:4150"
+    lookup_address_list:
+      - "127.0.0.1:4161"
+
+slave.consumer.topic: "slave.queue.%d.topic"
+
+master.consumer.topic:
+    - "master.queue.1.topic"
+    - "master.queue.2.topic"
+    - "master.queue.3.topic"
+    - "master.queue.4.topic"
+    - "master.queue.5.topic"

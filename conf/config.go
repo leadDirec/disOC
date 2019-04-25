@@ -14,13 +14,14 @@ type CustomerConfig struct {
 	Nsqd            ConfigNSQ        `yaml:"nsq"`
 	QuorumCap       int              `yaml:"quorum_cap"`        //集群数量
 	IsMasterConsume bool             `yaml:"is_master_consume"` //主节点是否消费数据
+	SlaveConsumerTopic string `yaml:"slave.consumer.topic"`
+	MasterConsumerTopic []string `yaml:"master.consumer.topic"`
 }
 
 type ConfigEtcdOption struct {
 	Hosts        []string `yaml:"hosts"`
 	ElectionPath string   `yaml:"election_path"`
 	SlavePath    string   `yaml:"slave_path"`
-	MasterPath   string   `yaml:"master_path"`
 }
 
 type ConfigNSQ struct {
