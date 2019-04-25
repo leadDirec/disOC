@@ -256,6 +256,7 @@ func (s *Service) WatchNodes() {
 					}
 				}
 			case <-s.watchNodesChan:
+				s.Scheduler.Stop()
 				return
 			}
 		}
