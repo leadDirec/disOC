@@ -4,8 +4,9 @@
 
 功能：
 1：选举出master节点/slave节点
-2：由master节点从数据源接收数据,分发给slave节点
-3: slave节点处理数据
+2：master节点指派slave节点处理某一分区数据
+3：由master节点从数据源接收数据,分发给slave节点
+4: slave节点处理数据
 5: 数据源-master节点-slave节点之间采用nsq进行数据交互
 6: master/slave众节点可相互故障转移以及slave节点可动态扩展
 
